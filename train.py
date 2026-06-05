@@ -68,8 +68,8 @@ raw_js_code = m2c.export_to_javascript(best_model_obj)
 import re
 fixed_js_code = re.sub(r'function \w+\s*\(', 'function predict(', raw_js_code)
 
-with open('interface/model.js', 'w') as f:
+with open('model.js', 'w') as f:
     f.write("// Avtomatik generatsiya qilingan standart ML modeli\n")
     f.write(fixed_js_code)
 
-print("Model muvaffaqiyatli 'interface/model.js' fayliga saqlandi!")
+print("Model muvaffaqiyatli 'model.js' fayliga saqlandi!")
