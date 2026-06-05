@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Academic Analytics Dashboard</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        background: #f0f4f8;
+        margin: 0;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .dashboard {
+        max-width: 900px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+      @media (max-width: 768px) {
+        .dashboard {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .form-section h2 {
+        color: #1a365d;
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-size: 22px;
+      }
+      .form-section p {
+        color: #718096;
+        font-size: 14px;
+        margin-bottom: 25px;
+      }
+      .form-group {
+        margin-bottom: 18px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      input:focus {
+        border-color: #3182ce;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        background: #3182ce;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 10px;
+      }
+      button:hover {
+        background: #2b6cb0;
+      }
+
+      .result-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px dashed #cbd5e0;
+        min-height: 300px;
+      }
+      .welcome-msg {
+        text-align: center;
+        color: #a0aec0;
+        font-style: italic;
+      }
+
+      .stat-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .card {
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+      }
+      .card-pass {
+        background: #ebf8ff;
+        color: #2b6cb0;
+        border: 1px solid #bee3f8;
+      }
+      .card-fail {
+        background: #fff5f5;
+        color: #c53030;
+        border: 1px solid #fed7d7;
+      }
+      .card num {
+        display: block;
+        font-size: 24px;
+        margin-top: 5px;
+      }
+
+      .progress-container {
+        background: #e2e8f0;
+        border-radius: 6px;
+        height: 16px;
+        overflow: hidden;
+        display: flex;
+        margin-top: 10px;
+      }
+      .progress-pass {
+        background: #48bb78;
+        transition: width 0.5s ease;
+      }
+      .progress-fail {
+        background: #f56565;
+        transition: width 0.5s ease;
+      }
+
+      .insights-box {
+        margin-top: 20px;
+        padding: 15px;
+        background: #ffffff;
+        border-radius: 8px;
+        border-left: 4px solid #3182ce;
+        font-size: 14px;
+        color: #4a5568;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="form-section">
+        <h2>ML Predictive Analytics</h2>
+        <p>
+          Enter the student metrics below to evaluate academic risk and
+          performance projections.
+        </p>
+
+        <div class="form-group">
+          <label>Weekly Self-Study Hours (0 - 40):</label>
+          <input type="number" id="study_hours" min="0" max="40" value="15" />
+        </div>
+
+        <div class="form-group">
+          <label>Attendance Percentage (50% - 100%):</label>
+          <input type="number" id="attendance" min="50" max="100" value="85" />
+        </div>
+
+        <div class="form-group">
+          <label>Class Participation Score (0 - 10):</label>
+          <input type="number" id="participation" min="0" max="10" value="6" />
+        </div>
+
+        <button onclick="getPrediction()">Execute Predictive Model</button>
+      </div>
+
+      <div class="result-section" id="display-panel">
+        <div class="welcome-msg" id="welcome-text">
+          Click the button to generate the Machine Learning performance
+          synthesis and risk optimization insights.
+        </div>
+      </div>
+    </div>
+
+    <script src="model.js"></script>
+    <script>
+      function getPrediction() {
+        // Safely check and hide the welcome text if it exists
+        const welcomeText = document.getElementById("welcome-text");
+        if (welcomeText) {
+          welcomeText.style.display = "none";
+        }
+
+        const study = parseFloat(document.getElementById("study_hours").value);
+        const attendance = parseFloat(
+          document.getElementById("attendance").value,
+        );
+        const participation = parseFloat(
+          document.getElementById("participation").value,
+        );
+
+        const features = [study, attendance, participation];
+        const panel = document.getElementById("display-panel");
+
+        try {
+          const output = predict(features);
+
+          let isPassed = false;
+          let passProb = 0;
+          let failProb = 0;
+
+          // Verify array output formatting from m2cgen [Fail_Probability, Pass_Probability]
+          if (Array.isArray(output) && output.length > 1) {
+            failProb = output[0];
+            passProb = output[1];
+            isPassed = passProb > failProb;
+          } else {
+            const singleVal = Array.isArray(output) ? output[0] : output;
+            isPassed = singleVal >= 0.5;
+            passProb = singleVal;
+            failProb = 1 - singleVal;
+          }
+
+          const passPercent = (passProb * 100).toFixed(1);
+          const failPercent = (failProb * 100).toFixed(1);
+
+          // Generate context-aware algorithmic insights
+          let recommendation = "";
+          if (study < 12) {
+            recommendation =
+              "💡 <strong>Prescriptive Insight:</strong> Self-study allocation falls below baseline thresholds. Increasing weekly commitment to ≥12 hours significantly optimizes predictive success probabilities.";
+          } else if (attendance < 75) {
+            recommendation =
+              "💡 <strong>Prescriptive Insight:</strong> Critical attendance deficit detected. Classroom engagement must be regularized to support consistent academic performance.";
+          } else {
+            recommendation =
+              "⭐ <strong>Prescriptive Insight:</strong> Balanced performance profile observed. Maintaining current instructional engagement and self-study velocity implies strong outcome assurance.";
+          }
+
+          // Render the advanced UI dashboard elements
+          panel.style.border = "none";
+          panel.innerHTML = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="padding: 6px 12px; background: ${isPassed ? "#c6f6d5" : "#fed7d7"}; color: ${isPassed ? "#22543d" : "#742a2a"}; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                    Status: ${isPassed ? "Optimal" : "At Risk"}
+                </span>
+                <h3 style="margin-top: 15px; color: #2d3748; font-size: 20px;">
+                    ${isPassed ? "🎉 Predicted Result: PASS" : "❌ Predicted Result: FAIL"}
+                </h3>
+            </div>
+
+            <div class="stat-cards">
+                <div class="card card-pass">
+                    Success Index
+                    <num>${passPercent}%</num>
+                </div>
+                <div class="card card-fail">
+                    Attrition Risk
+                    <num>${failPercent}%</num>
+                </div>
+            </div>
+
+            <label style="font-size: 11px; color: #718096;">Probability Distribution Balance</label>
+            <div class="progress-container">
+                <div class="progress-pass" style="width: ${passPercent}%"></div>
+                <div class="progress-fail" style="width: ${failPercent}%"></div>
+            </div>
+
+            <div class="insights-box">
+                ${recommendation}
+            </div>
+        `;
+        } catch (e) {
+          console.error(e);
+          panel.innerHTML = `<div style="color:red; text-align:center;">Error evaluating the predictive matrix. Ensure model.js is generated.</div>`;
+        }
+      }
+    </script>
+  </body>
+</html>
